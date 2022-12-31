@@ -1,4 +1,4 @@
-module nuclearpond
+module github.com/DevSecOps/nuclear-pond
 
 go 1.19
 
