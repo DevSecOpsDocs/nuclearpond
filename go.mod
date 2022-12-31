@@ -1,4 +1,4 @@
-module github.com/DevSecOps/nuclear-pond
+module github.com/DevSecOpsDocs/Nuclear-Pond
 
 go 1.19
 
