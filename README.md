@@ -39,7 +39,7 @@ $(echo -ne "-t dns" | base64)
 This output is recommended when leveraging Nuclear Pond as once the script invokes, all of the work is handed off to the cloud for you to analyze another time. This output is known as `s3` and you can output it by specifying `-o s3`. You can also specify `-l targets.txt` and `-b 10` to invoke the lambda functions in batches of 10 targets. 
 
 ```
-./nuclearpond -t devsecopsdocs.com -r us-east-1 -f jwalker-nuclei-runner-function -a $(echo -ne "-t dns" | base64) -o s3 -b 1
+$ Nuclear-Pond -t devsecopsdocs.com -r us-east-1 -f jwalker-nuclei-runner-function -a $(echo -ne "-t dns" | base64) -o s3 -b 1
   _   _                  _                           ____                        _
  | \ | |  _   _    ___  | |   ___    __ _   _ __    |  _ \    ___    _ __     __| |
  |  \| | | | | |  / __| | |  / _ \  / _` | | '__|   | |_) |  / _ \  | '_ \   / _` |
@@ -70,7 +70,7 @@ Results stored in: s3://nuclei-runner-artifacts/findings/2022/12/31/02/nuclei-fi
 Think of this mechanism as a way to run the CLI directly on the cloud. This allows you to specify
 
 ```log
-$ nuclearpond -t devsecopsdocs.com -r us-east-1 -f nuclei-runner-function -a $(echo -ne "-t dns" | base64) -o cmd -b 1
+$ Nuclear-Pond -t devsecopsdocs.com -r us-east-1 -f nuclei-runner-function -a $(echo -ne "-t dns" | base64) -o cmd -b 1
   _   _                  _                           ____                        _
  | \ | |  _   _    ___  | |   ___    __ _   _ __    |  _ \    ___    _ __     __| |
  |  \| | | | | |  / __| | |  / _ \  / _` | | '__|   | |_) |  / _ \  | '_ \   / _` |
