@@ -9,10 +9,10 @@ It leverages [AWS Lambda](https://aws.amazon.com/lambda/) as a backend to invoke
 
 ## Features
 
-- Specify any Nuclei arguments as normal
-- Output as cmd, json, or to a data lake
-- Specify threads and parallel invocations
-- Ability to customize batch size
+- Output results to your terminal, as json, or to an S3 data lake
+- Specify threads and parallel invocations in any desired number of batches
+- Specify any Nuclei arguments just like you would locally
+- Specify a single host or from a file
 
 ## Usage
 
@@ -20,67 +20,43 @@ Think of Nuclear Pond as just a way for you to run Nuclei in the cloud. You can 
 
 ## Setup & Installation
 
-To install Nuclear Pond, you need to configure the backend [terraform module](https://github.com/DevSecOpsDocs/terraform-nuclear-pond). You can do this by running `terraform apply`, leveraging terragrunt, and on release we intend to make this easier to deploy. 
+To install Nuclear Pond, you need to configure the backend [terraform module](https://github.com/DevSecOpsDocs/terraform-nuclear-pond). You can do this by running `terraform apply` or by leveraging [terragrunt](https://terragrunt.gruntwork.io/). 
 
 ```bash
 $ go install github.com/DevSecOpsDocs/nuclearpond@latest
 ```
 
+### Backend Configuration
+
+You can either pass in your backend with flags or through environment variables. You can use `-f` or `--function-name` to specify your Lambda function and `-r` or `--region` to the specified region. The environment variables are `AWS_REGION` and `AWS_LAMBDA_FUNCTION_NAME`. 
+
 ### Command line flags
 
-In order to specify the command line flags it's important to encode them as base64. When doing so it will send that off to the backend and run directly on nuclei. Any flags available in the current version should be available outside of `-o` and `-json`. 
+Below are some of the flags you can specify when running `nuclearpond`. The primary flags you need are `-t` or `-l` for your target(s), `-a` for the nuclei args, and `-o` to specify your output. When specifying Nuclei args you must pass them in as base64 encoded strings by performing `-a $(echo -ne "-t dns" | base64)`.
 
-```
-$(echo -ne "-t dns" | base64)
-```
+```bash
+$ nuclearpond run -h
+Executes nuclei tasks in parallel by invoking lambda asynchronously
 
-### Data Lake Output
+Usage:
+  nuclearpond run [flags]
 
-This output is recommended when leveraging Nuclear Pond as once the script invokes, all of the work is handed off to the cloud for you to analyze another time. This output is known as `s3` and you can output it by specifying `-o s3`. You can also specify `-l targets.txt` and `-b 10` to invoke the lambda functions in batches of 10 targets. 
-
-```
-$ nuclearpond run -t devsecopsdocs.com -a $(echo -ne "-t dns -silent" | base64) -o s3
-  _   _                  _                           ____                        _
- | \ | |  _   _    ___  | |   ___    __ _   _ __    |  _ \    ___    _ __     __| |
- |  \| | | | | |  / __| | |  / _ \  / _` | | '__|   | |_) |  / _ \  | '_ \   / _` |
- | |\  | | |_| | | (__  | | |  __/ | (_| | | |      |  __/  | (_) | | | | | | (_| |
- |_| \_|  \__,_|  \___| |_|  \___|  \__,_| |_|      |_|      \___/  |_| |_|  \__,_|
-
-                                                                  devsecopsdocs.com
-
-2023/01/01 16:42:25 Running nuclei against the target devsecopsdocs.com
-2023/01/01 16:42:25 Running with 1 threads
-2023/01/01 16:42:26 Saved results in s3://jwalker-nuclei-runner-artifacts/findings/2023/01/02/00/nuclei-findings-c69e8359-17b3-4783-b8c4-d6754b3235b8.json
-2023/01/01 16:42:26 Completed all parallel operations, best of luck!
-```
-
-### Command Line Output
-
-Think of this mechanism as a way to run the CLI directly on the cloud. This allows you to specify
-
-```log
-$ nuclearpond run -t devsecopsdocs.com -a $(echo -ne "-t dns -silent" | base64) -o cmd
-  _   _                  _                           ____                        _
- | \ | |  _   _    ___  | |   ___    __ _   _ __    |  _ \    ___    _ __     __| |
- |  \| | | | | |  / __| | |  / _ \  / _` | | '__|   | |_) |  / _ \  | '_ \   / _` |
- | |\  | | |_| | | (__  | | |  __/ | (_| | | |      |  __/  | (_) | | | | | | (_| |
- |_| \_|  \__,_|  \___| |_|  \___|  \__,_| |_|      |_|      \___/  |_| |_|  \__,_|
-
-                                                                  devsecopsdocs.com
-
-2023/01/01 16:41:35 Running nuclei against the target devsecopsdocs.com
-2023/01/01 16:41:35 Running with 1 threads
-[nameserver-fingerprint] [dns] [info] devsecopsdocs.com [ns-487.awsdns-60.com.,ns-579.awsdns-08.net.,ns-1309.awsdns-35.org.,ns-1822.awsdns-35.co.uk.]
-[mx-fingerprint] [dns] [info] devsecopsdocs.com [20 mailsec.protonmail.ch.,10 mail.protonmail.ch.]
-[txt-fingerprint] [dns] [info] devsecopsdocs.com ["protonmail-verification=14a44944a2577395944d07e38d16139898edee75","v=spf1 include:_spf.protonmail.ch mx ~all"]
-[mx-service-detector:ProtonMail] [dns] [info] devsecopsdocs.com
-
-2023/01/01 16:41:35 Completed all parallel operations, best of luck!
+Flags:
+  -a, --args string            nuclei arguments as base64 encoded string
+  -b, --batch-size int         batch size to run nuclei in parallel (default 1)
+  -f, --function-name string   AWS Lambda function name
+  -h, --help                   help for run
+  -o, --output string          output type to save nuclei results(s3, cmd, or json) (default "cmd")
+  -r, --region string          AWS region to run nuclei
+  -s, --silent                 silent command line output
+  -t, --target string          individual target to specify
+  -l, --targets string         list of targets in a file
+  -c, --threads int            number of threads to run nuclei in parallel (default 1)
 ```
 
 ## Retrieving Findings
 
-To explore your findings in Athena all you need to do is perform the following query! The database and the table should already be available to you. You may have to configure query results if you have not done so already. 
+If you have specified `s3` as the output, your findings will be located in S3. The fastest way to get at them is to do so with Athena. Assuming you setup the terraform-module as your backend, all you need to do is query them directly through athena. You may have to configure query results if you have not done so already. 
 
 ```sql
 select
@@ -122,4 +98,6 @@ The backend infrastructure, all within [terraform module](https://github.com/Dev
   - Stores findings
 - Glue Database and Table
   - Allows you to query the findings in S3
+  - Partitioned by the hour
+  - Partition projection
 - IAM Role for Lambda Function
