@@ -18,7 +18,7 @@ var rootCmd = &cobra.Command{
 	Use:     "nuclearpond",
 	Short:   "A CLI tool for Nuclear Pond to run nuclei in parallel",
 	Long:    "Nuclear Pond invokes nuclei in parallel through invoking lambda functions, customizes command line flags, specifies output, and batches requests.",
-	Example: `nuclearpond run -l targets.txt -r us-east-1 -f nuclei-runner -a $(echo -ne "-t dns" | base64) -o s3 -b 20)`,
+	Example: `nuclearpond run -t devsecopsdocs.com -a $(echo -ne "-t dns" | base64) -o cmd`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(asciiBanner)
 		cmd.Help()

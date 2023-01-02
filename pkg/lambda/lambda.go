@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -93,7 +94,8 @@ func invokeFunction(payload string, functionName string) (string, error) {
 	// Invoke the lambda function
 	result, err := svc.Invoke(input)
 	if err != nil {
-		return "", err
+		log.Fatal("Failed to invoke lambda function: ", err)
+		os.Exit(1)
 	}
 
 	// Return the response
