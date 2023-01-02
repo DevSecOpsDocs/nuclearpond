@@ -23,7 +23,7 @@ Think of Nuclear Pond as just a way for you to run Nuclei in the cloud. You can 
 To install Nuclear Pond, you need to configure the backend [terraform module](https://github.com/DevSecOpsDocs/terraform-nuclear-pond). You can do this by running `terraform apply`, leveraging terragrunt, and on release we intend to make this easier to deploy. 
 
 ```bash
-$ go get github.com/DevSecOpsDocs/nuclear-pond
+$ go install github.com/DevSecOpsDocs/nuclearpond@latest
 ```
 
 ### Command line flags
@@ -39,30 +39,19 @@ $(echo -ne "-t dns" | base64)
 This output is recommended when leveraging Nuclear Pond as once the script invokes, all of the work is handed off to the cloud for you to analyze another time. This output is known as `s3` and you can output it by specifying `-o s3`. You can also specify `-l targets.txt` and `-b 10` to invoke the lambda functions in batches of 10 targets. 
 
 ```
-$ Nuclear-Pond -t devsecopsdocs.com -r us-east-1 -f jwalker-nuclei-runner-function -a $(echo -ne "-t dns" | base64) -o s3 -b 1
+$ nuclearpond run -t devsecopsdocs.com -a $(echo -ne "-t dns -silent" | base64) -o s3
   _   _                  _                           ____                        _
  | \ | |  _   _    ___  | |   ___    __ _   _ __    |  _ \    ___    _ __     __| |
  |  \| | | | | |  / __| | |  / _ \  / _` | | '__|   | |_) |  / _ \  | '_ \   / _` |
  | |\  | | |_| | | (__  | | |  __/ | (_| | | |      |  __/  | (_) | | | | | | (_| |
  |_| \_|  \__,_|  \___| |_|  \___|  \__,_| |_|      |_|      \___/  |_| |_|  \__,_|
 
-Nuclear Pond is a tool to run nuclei in parallel on AWS Lambda
-Version: 0.1
-Author: @jonathanwalker
+                                                                  devsecopsdocs.com
 
-Configuration
-Function:  nuclei-runner-function
-Region:  us-east-1
-Arguments: nuclei -t devsecopsdocs.com -t dns
-Batch Size:  1
-Threads:  0
-Output:  s3
-
-Launching...
-Total targets:  1
-Number of Invocations:  1
-
-Results stored in: s3://nuclei-runner-artifacts/findings/2022/12/31/02/nuclei-findings-f9bf0672-93c4-440e-bde3-c03c515be785.json
+2023/01/01 16:42:25 Running nuclei against the target devsecopsdocs.com
+2023/01/01 16:42:25 Running with 1 threads
+2023/01/01 16:42:26 Saved results in s3://jwalker-nuclei-runner-artifacts/findings/2023/01/02/00/nuclei-findings-c69e8359-17b3-4783-b8c4-d6754b3235b8.json
+2023/01/01 16:42:26 Completed all parallel operations, best of luck!
 ```
 
 ### Command Line Output
@@ -70,49 +59,23 @@ Results stored in: s3://nuclei-runner-artifacts/findings/2022/12/31/02/nuclei-fi
 Think of this mechanism as a way to run the CLI directly on the cloud. This allows you to specify
 
 ```log
-$ Nuclear-Pond -t devsecopsdocs.com -r us-east-1 -f nuclei-runner-function -a $(echo -ne "-t dns" | base64) -o cmd -b 1
+$ nuclearpond run -t devsecopsdocs.com -a $(echo -ne "-t dns -silent" | base64) -o cmd
   _   _                  _                           ____                        _
  | \ | |  _   _    ___  | |   ___    __ _   _ __    |  _ \    ___    _ __     __| |
  |  \| | | | | |  / __| | |  / _ \  / _` | | '__|   | |_) |  / _ \  | '_ \   / _` |
  | |\  | | |_| | | (__  | | |  __/ | (_| | | |      |  __/  | (_) | | | | | | (_| |
  |_| \_|  \__,_|  \___| |_|  \___|  \__,_| |_|      |_|      \___/  |_| |_|  \__,_|
 
-Nuclear Pond is a tool to run nuclei in parallel on AWS Lambda
-Version: 0.1
-Author: @jonathanwalker
+                                                                  devsecopsdocs.com
 
-Configuration
-Function:  nuclei-runner-function
-Region:  us-east-1
-Arguments: nuclei -t devsecopsdocs.com -t dns
-Batch Size:  1
-Threads:  0
-Output:  cmd
-
-Launching...
-Total targets:  1
-Number of Invocations:  1
-
-
-                     __     _
-   ____  __  _______/ /__  (_)
-  / __ \/ / / / ___/ / _ \/ /
- / / / / /_/ / /__/ /  __/ /
-/_/ /_/\__,_/\___/_/\___/_/   v2.8.3
-
-		projectdiscovery.io
-
-[INF] Using Nuclei Engine 2.8.3 (latest)
-[INF] Using Nuclei Templates 9.3.3 (latest)
-[INF] Templates added in last update: 238
-[INF] Templates loaded for scan: 17
-[INF] Targets loaded for scan: 1
+2023/01/01 16:41:35 Running nuclei against the target devsecopsdocs.com
+2023/01/01 16:41:35 Running with 1 threads
+[nameserver-fingerprint] [dns] [info] devsecopsdocs.com [ns-487.awsdns-60.com.,ns-579.awsdns-08.net.,ns-1309.awsdns-35.org.,ns-1822.awsdns-35.co.uk.]
+[mx-fingerprint] [dns] [info] devsecopsdocs.com [20 mailsec.protonmail.ch.,10 mail.protonmail.ch.]
 [txt-fingerprint] [dns] [info] devsecopsdocs.com ["protonmail-verification=14a44944a2577395944d07e38d16139898edee75","v=spf1 include:_spf.protonmail.ch mx ~all"]
-[nameserver-fingerprint] [dns] [info] devsecopsdocs.com [ns-1309.awsdns-35.org.,ns-1822.awsdns-35.co.uk.,ns-487.awsdns-60.com.,ns-579.awsdns-08.net.]
 [mx-service-detector:ProtonMail] [dns] [info] devsecopsdocs.com
-[mx-fingerprint] [dns] [info] devsecopsdocs.com [10 mail.protonmail.ch.,20 mailsec.protonmail.ch.]
 
-Completed all parallel operations, best of luck!
+2023/01/01 16:41:35 Completed all parallel operations, best of luck!
 ```
 
 ## Retrieving Findings
@@ -161,3 +124,4 @@ The backend infrastructure, all within [terraform module](https://github.com/Dev
   - Allows you to query the findings in S3
 - IAM Role for Lambda Function
 
+<img src="assets/infrastructure.png" width="800" height="400" align="center">
