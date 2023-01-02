@@ -84,9 +84,9 @@ func init() {
 	runCmd.Flags().StringVarP(&target, "target", "t", "", "individual target to specify")
 	runCmd.Flags().StringVarP(&targets, "targets", "l", "", "list of targets in a file")
 	runCmd.Flags().StringVarP(&nucleiArgs, "args", "a", "", "nuclei arguments as base64 encoded string")
-	runCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 1, "batch size to run nuclei in parallel")
+	runCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 1, "batch size for number of targets per execution")
 	runCmd.Flags().StringVarP(&output, "output", "o", "cmd", "output type to save nuclei results(s3, cmd, or json)")
-	runCmd.Flags().IntVarP(&threads, "threads", "c", 1, "number of threads to run nuclei in parallel")
+	runCmd.Flags().IntVarP(&threads, "threads", "c", 1, "number of threads to run lambda functions, default is 1 which will be slow")
 
 	// Region flag
 	runCmd.Flags().StringVarP(&region, "region", "r", "", "AWS region to run nuclei")
