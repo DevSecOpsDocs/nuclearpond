@@ -64,7 +64,7 @@ var runCmd = &cobra.Command{
 			log.Println("Running nuclear pond against", len(urls), "targets")
 			batches := helpers.SplitSlice(urls, batchSize)
 			log.Println("Splitting targets into", len(batches), "individual executions")
-			log.Println("Running with" + fmt.Sprint(threads) + "threads")
+			log.Println("Running with " + fmt.Sprint(threads) + " threads")
 			core.ExecuteScans(batches, output, functionName, nucleiArgs, threads, silent)
 		} else {
 			log.Println("Running nuclei against the target", target)

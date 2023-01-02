@@ -50,6 +50,7 @@ func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
 	if output == "s3" {
 		// if lambdaResponse contains the string "No findings" then return
 		if strings.Contains(lambdaResponse.(string), "No findings") {
+			log.Println("Scan completed with no findings")
 			return
 		}
 		log.Println("Saved results in", lambdaResponse)
@@ -58,6 +59,12 @@ func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
 		lambdaResponseString := lambdaResponse.(string)
 		// convert response from base64 to colorized terminal output
 		decodedBytes, _ := base64.StdEncoding.DecodeString(lambdaResponseString)
+		// if decodedBytes is empty then return
+		if len(decodedBytes) == 0 {
+			log.Println("Scan completed with no output")
+			return
+		}
+		log.Println("Scan complete with output:")
 		fmt.Println(string(decodedBytes))
 	} else if output == "json" {
 		// if lambdaResponse contains the string "No findings" then return
