@@ -123,5 +123,3 @@ The backend infrastructure, all within [terraform module](https://github.com/Dev
 - Glue Database and Table
   - Allows you to query the findings in S3
 - IAM Role for Lambda Function
-
-<img src="assets/infrastructure.png" width="800" height="400" align="center">
