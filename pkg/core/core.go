@@ -5,11 +5,15 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/DevSecOpsDocs/nuclearpond/pkg/lambda"
 )
 
 func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiArgs string, threads int, silent bool) {
+	// Get start time
+	start := time.Now()
+
 	// Create a WaitGroup to wait for the goroutines to finish
 	var wg sync.WaitGroup
 
@@ -32,17 +36,17 @@ func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiAr
 
 	// Add tasks to the channel
 	for _, batch := range batches {
-		tasks <- func() {
-			decodedBytes, _ := base64.StdEncoding.DecodeString(nucleiArgs)
-			// Convert args.NucleiArg from base64, to string, split by space, and convert to list
-			nucleiFlags := strings.Split(string(decodedBytes), " ")
+		decodedBytes, _ := base64.StdEncoding.DecodeString(nucleiArgs)
+		// Convert args.NucleiArg from base64, to string, split by space, and convert to list
+		nucleiFlags := strings.Split(string(decodedBytes), " ")
 
-			// create lambda invoke struct
-			lambdaInvoke := lambda.LambdaInvoke{
-				Targets: batch,
-				Args:    nucleiFlags,
-				Output:  output,
-			}
+		// create lambda invoke struct
+		lambdaInvoke := lambda.LambdaInvoke{
+			Targets: batch,
+			Args:    nucleiFlags,
+			Output:  output,
+		}
+		tasks <- func() {
 			lambda.InvokeLambdas(lambdaInvoke, lambdaName, output)
 		}
 	}
@@ -52,6 +56,6 @@ func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiAr
 
 	// Print the results if not silent mode
 	if !silent {
-		log.Println("Completed all parallel operations, best of luck!")
+		log.Println("Completed all parallel operations in", time.Since(start), ", best of luck!")
 	}
 }
