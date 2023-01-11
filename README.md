@@ -3,16 +3,19 @@
 
 <img src="assets/logo.png" width="400" height="300" align="right">
 
-Nuclear Pond is used to leverage [Nuclei](https://github.com/projectdiscovery/nuclei) in the cloud with unremarkable speed, flexibility, and perform internet wide scans for far less than a cup of coffee. 
+Nuclear Pond is used to leverage [Nuclei](https://github.com/projectdiscovery/nuclei) in the cloud with unremarkable speed, flexibility, and [perform internet wide scans for far less than a cup of coffee](https://devsecopsdocs.com/blog/nuclear-pond/). 
 
 It leverages [AWS Lambda](https://aws.amazon.com/lambda/) as a backend to invoke Nuclei scans in parallel, choice of storing json findings in s3 to query with [AWS Athena](https://aws.amazon.com/athena/), and is easily one of the cheapest ways you can execute scans in the cloud. 
 
 ## Features
 
-- Output results to your terminal, as json, or to an S3 data lake
+- Output results to your terminal, as json, or to an S3
 - Specify threads and parallel invocations in any desired number of batches
 - Specify any Nuclei arguments just like you would locally
 - Specify a single host or from a file
+- Run the http server to take scans from the API
+- Run the http server to the status of the scans
+- Query findings through Athena for searching
 
 ## Usage
 
@@ -26,9 +29,14 @@ To install Nuclear Pond, you need to configure the backend [terraform module](ht
 $ go install github.com/DevSecOpsDocs/nuclearpond@latest
 ```
 
-### Backend Configuration
+## Environment Variables
 
-You can either pass in your backend with flags or through environment variables. You can use `-f` or `--function-name` to specify your Lambda function and `-r` or `--region` to the specified region. The environment variables are `AWS_REGION` and `AWS_LAMBDA_FUNCTION_NAME`. 
+You can either pass in your backend with flags or through environment variables. You can use `-f` or `--function-name` to specify your Lambda function and `-r` or `--region` to the specified region. Below are environment variables you can use. 
+
+- `AWS_LAMBDA_FUNCTION_NAME` is the name of your lambda function to execute the scans on
+- `AWS_REGION` is the region your resources are deployed
+- `NUCLEARPOND_API_KEY` is the API key for authenticating to the API
+- `AWS_DYNAMODB_TABLE` is the dynamodb table to store API scan states
 
 ### Command line flags
 
@@ -43,7 +51,7 @@ Usage:
 
 Flags:
   -a, --args string            nuclei arguments as base64 encoded string
-  -b, --batch-size int         batch size to run nuclei in parallel (default 1)
+  -b, --batch-size int         batch size for number of targets per execution (default 1)
   -f, --function-name string   AWS Lambda function name
   -h, --help                   help for run
   -o, --output string          output type to save nuclei results(s3, cmd, or json) (default "cmd")
@@ -51,8 +59,12 @@ Flags:
   -s, --silent                 silent command line output
   -t, --target string          individual target to specify
   -l, --targets string         list of targets in a file
-  -c, --threads int            number of threads to run nuclei in parallel (default 1)
+  -c, --threads int            number of threads to run lambda functions, default is 1 which will be slow (default 1)
 ```
+
+## Custom Templates
+
+The terraform module uploads a zip file with templates downloaded directly from nuclei-templates repository but it can be customized by providing any url to your templates. This can be through downloading your repositories zip file and retrieving the url with the key as a variable. To reference these instead of the latest, also additionally for performance benefits, you can reference these by adding the flag `-t /opt/nuclei-templates-9.3.4/dns`. The directory `nuclei-templates-9.3.4` may change depending on what the folder name is within the zip file and in our case it includes the release. 
 
 ## Retrieving Findings
 

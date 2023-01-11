@@ -7,6 +7,7 @@ import (
 
 	"github.com/DevSecOpsDocs/nuclearpond/pkg/core"
 	"github.com/DevSecOpsDocs/nuclearpond/pkg/helpers"
+	"github.com/DevSecOpsDocs/nuclearpond/pkg/server"
 
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -75,6 +76,22 @@ var runCmd = &cobra.Command{
 	},
 }
 
+var startServer = &cobra.Command{
+	Use:   "serve",
+	Short: "Launch API to launch run tasks to the nuclei runner.",
+	Long:  "Executes nuclei through an API through asynchronous lambda functions",
+	Run: func(cmd *cobra.Command, args []string) {
+		// Print banner
+		fmt.Println(asciiBanner)
+		fmt.Println("                                                                  devsecopsdocs.com")
+		fmt.Println()
+		// Start server
+		log.Println("Running nuclear pond http server on port 8080")
+		log.Println("http://localhost:8080")
+		server.HandleRequests()
+	},
+}
+
 func init() {
 	// Mark flags as required
 	runCmd.MarkFlagRequired("args")
@@ -121,6 +138,7 @@ func Execute() error {
 
 	rootCmd.HasHelpSubCommands()
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(startServer)
 
 	return rootCmd.Execute()
 }
