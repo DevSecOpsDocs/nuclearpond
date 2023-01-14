@@ -56,6 +56,6 @@ func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiAr
 
 	// Print the results if not silent mode
 	if !silent {
-		log.Println("Completed all parallel operations in", time.Since(start), ", best of luck!")
+		log.Println("Completed all parallel operations, best of luck! Completed in", time.Since(start))
 	}
 }

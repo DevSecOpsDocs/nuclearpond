@@ -47,9 +47,6 @@ func scanStatusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	scanId := parts[2]
-
-	log.Println("Getting scan state for", scanId)
-
 	log.Println("Getting scan state for", scanId)
 
 	state, err := getScanState(scanId)

@@ -1,14 +1,12 @@
 package lambda
 
 import (
-	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
+	"github.com/DevSecOpsDocs/nuclearpond/pkg/outputs"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -48,37 +46,11 @@ func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
 
 	// Change outputs depending on the output type
 	if output == "s3" {
-		// if lambdaResponse contains the string "No findings" then return
-		if strings.Contains(lambdaResponse.(string), "No findings") {
-			log.Println("Scan completed with no findings")
-			return
-		}
-		log.Println("Saved results in", lambdaResponse)
+		outputs.S3Output(lambdaResponse)
 	} else if output == "cmd" {
-		// convert lambdaResponse to string
-		lambdaResponseString := lambdaResponse.(string)
-		// convert response from base64 to colorized terminal output
-		decodedBytes, _ := base64.StdEncoding.DecodeString(lambdaResponseString)
-		// if decodedBytes is empty then return
-		if len(decodedBytes) == 0 {
-			log.Println("Scan completed with no output")
-			return
-		}
-		log.Println("Scan complete with output:")
-		fmt.Println(string(decodedBytes))
+		outputs.CmdOutput(lambdaResponse)
 	} else if output == "json" {
-		// if lambdaResponse contains the string "No findings" then return
-		if strings.Contains(lambdaResponse.(string), "No findings") {
-			return
-		}
-		// pretty print json in lambdaResponse indented by 4 spaces
-		var prettyJSON bytes.Buffer
-		error := json.Indent(&prettyJSON, []byte(lambdaResponse.(string)), "", "    ")
-		if error != nil {
-			log.Println("JSON parse error: ", error)
-			return
-		}
-		fmt.Println(string(prettyJSON.Bytes()))
+		outputs.JsonOutput(lambdaResponse)
 	}
 }
 

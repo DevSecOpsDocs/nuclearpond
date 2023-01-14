@@ -77,7 +77,7 @@ var runCmd = &cobra.Command{
 }
 
 var startServer = &cobra.Command{
-	Use:   "serve",
+	Use:   "service",
 	Short: "Launch API to launch run tasks to the nuclei runner.",
 	Long:  "Executes nuclei through an API through asynchronous lambda functions",
 	Run: func(cmd *cobra.Command, args []string) {
