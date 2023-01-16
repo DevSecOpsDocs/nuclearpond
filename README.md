@@ -16,6 +16,7 @@ It leverages [AWS Lambda](https://aws.amazon.com/lambda/) as a backend to invoke
 - Run the http server to take scans from the API
 - Run the http server to get status of the scans
 - Query findings through Athena for searching S3
+- Specify a custom nuclei and reporting configuration
 
 ## Usage
 
@@ -42,6 +43,17 @@ You can either pass in your backend with flags or through environment variables.
 
 Below are some of the flags you can specify when running `nuclearpond`. The primary flags you need are `-t` or `-l` for your target(s), `-a` for the nuclei args, and `-o` to specify your output. When specifying Nuclei args you must pass them in as base64 encoded strings by performing `-a $(echo -ne "-t dns" | base64)`.
 
+#### Commands
+
+Below are the subcommands you can execute within nuclearpond.
+
+- run: Execute nuclei scans
+- service: Basic API to execute nuclei scans
+
+### Run
+
+To run nuclearpond subcommand `nuclearpond run -t devsecopsdocs.com -r us-east-1 -f jwalker-nuclei-runner-function -a $(echo -ne "-t dns" | base64) -o cmd -b 1` in which the target is `devsecopsdocs.com`, region is `us-east-1`, lambda function name is `jwalker-nuclei-runner-function`, nuclei arguments are `-t dns`, output is `cmd`, and executes one function through a batch of one host through `-b 1`.
+
 ```bash
 $ nuclearpond run -h
 Executes nuclei tasks in parallel by invoking lambda asynchronously
@@ -64,7 +76,12 @@ Flags:
 
 ## Custom Templates
 
-The terraform module uploads a zip file with templates downloaded directly from nuclei-templates repository but it can be customized by providing any url to your templates. This can be through downloading your repositories zip file and retrieving the url with the key as a variable. To reference these instead of the latest, also additionally for performance benefits, you can reference these by adding the flag `-t /opt/nuclei-templates-9.3.4/dns`. The directory `nuclei-templates-9.3.4` may change depending on what the folder name is within the zip file and in our case it includes the release. 
+The terraform module by default downloads the templates on execution as well as adds the templates as a layer. The [variables to download templates](https://github.com/DevSecOpsDocs/terraform-nuclear-pond/blob/main/variables.tf#L16-L36) use the terraform github provider to download the release zip. The folder name within the zip will be located within `/opt`. Since Nuclei downloads them on run we do not have to but to improve performance you can specify `-t /opt/nuclei-templates-9.3.4/dns` to execute templates from the downloaded zip. To specify your own templates you must reference a release. When doing so on your own repository you must specify these variables in the terraform module, `github_token` is not required if your repository is public. 
+
+- github_repository
+- github_owner
+- release_tag
+- github_token
 
 ## Retrieving Findings
 
