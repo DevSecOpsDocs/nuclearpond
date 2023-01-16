@@ -9,7 +9,7 @@ It leverages [AWS Lambda](https://aws.amazon.com/lambda/) as a backend to invoke
 
 ## Features
 
-- Output results to your terminal, as json, or to an S3 bucket
+- Output results to your terminal, as json, or to S3
 - Specify threads and parallel invocations in any desired number of batches
 - Specify any Nuclei arguments just like you would locally
 - Specify a single host or from a file
