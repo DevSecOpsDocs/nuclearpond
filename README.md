@@ -9,13 +9,13 @@ It leverages [AWS Lambda](https://aws.amazon.com/lambda/) as a backend to invoke
 
 ## Features
 
-- Output results to your terminal, as json, or to an S3
+- Output results to your terminal, as json, or to an S3 bucket
 - Specify threads and parallel invocations in any desired number of batches
 - Specify any Nuclei arguments just like you would locally
 - Specify a single host or from a file
 - Run the http server to take scans from the API
 - Run the http server to get status of the scans
-- Query findings through Athena for searching
+- Query findings through Athena for searching S3
 
 ## Usage
 
