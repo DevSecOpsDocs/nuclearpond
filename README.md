@@ -16,7 +16,7 @@ It leverages [AWS Lambda](https://aws.amazon.com/lambda/) as a backend to invoke
 - Run the http server to take scans from the API
 - Run the http server to get status of the scans
 - Query findings through Athena for searching S3
-- Specify a custom nuclei and reporting configuration
+- Specify a custom nuclei and reporting configurations
 
 ## Usage
 

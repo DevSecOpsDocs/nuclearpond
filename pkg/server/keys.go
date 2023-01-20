@@ -20,7 +20,7 @@ func generateAPIKey() string {
 		log.Fatal(err)
 	}
 	apiKey := hex.EncodeToString(b)
-	log.Println("Generated API key:", apiKey)
+	log.Println("Generated API key NUCLEARPOND_API_KEY:", apiKey)
 	os.Setenv("NUCLEARPOND_API_KEY", apiKey)
 	return apiKey
 }

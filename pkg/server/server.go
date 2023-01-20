@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/google/uuid"
@@ -78,8 +79,35 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"RequestId": scanId})
 }
 
+func serverCheck() {
+	// check if NUCLEARPOND_API_KEY is set
+	if os.Getenv("NUCLEARPOND_API_KEY") == "" {
+		log.Println("NUCLEARPOND_API_KEY not set")
+	}
+
+	// check if AWS_REGION and AWS_LAMBDA_FUNCTION_NAME are set
+	_, region := os.LookupEnv("AWS_REGION")
+	if !region {
+		log.Fatal("AWS_REGION not set")
+		os.Exit(1)
+	}
+	_, function := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME")
+	if !function {
+		log.Fatal("AWS_LAMBDA_FUNCTION_NAME not set")
+		os.Exit(1)
+	}
+	_, dynamodb := os.LookupEnv("AWS_DYNAMODB_TABLE")
+	if !dynamodb {
+		log.Fatal("AWS_DYNAMODB_TABLE not set")
+		os.Exit(1)
+	}
+}
+
 func HandleRequests() {
-	// generate API key
+	// Check if the server is configured correctly
+	serverCheck()
+
+	// Retrieve/Generate API key
 	generateAPIKey()
 
 	http.HandleFunc("/", indexHandler)

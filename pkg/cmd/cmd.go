@@ -93,10 +93,11 @@ var startServer = &cobra.Command{
 }
 
 func init() {
+	// run subcommand
 	// Mark flags as required
 	runCmd.MarkFlagRequired("args")
 	runCmd.MarkFlagRequired("output")
-
+	// General flags
 	runCmd.Flags().BoolVarP(&silent, "silent", "s", false, "silent command line output")
 	runCmd.Flags().StringVarP(&target, "target", "t", "", "individual target to specify")
 	runCmd.Flags().StringVarP(&targets, "targets", "l", "", "list of targets in a file")
@@ -104,7 +105,6 @@ func init() {
 	runCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 1, "batch size for number of targets per execution")
 	runCmd.Flags().StringVarP(&output, "output", "o", "cmd", "output type to save nuclei results(s3, cmd, or json)")
 	runCmd.Flags().IntVarP(&threads, "threads", "c", 1, "number of threads to run lambda functions, default is 1 which will be slow")
-
 	// Region flag
 	runCmd.Flags().StringVarP(&region, "region", "r", "", "AWS region to run nuclei")
 	if region == "" {
@@ -115,7 +115,6 @@ func init() {
 			runCmd.Flags().Set("region", region)
 		}
 	}
-
 	// Function name flag
 	runCmd.Flags().StringVarP(&functionName, "function-name", "f", "", "AWS Lambda function name")
 	if functionName == "" {
