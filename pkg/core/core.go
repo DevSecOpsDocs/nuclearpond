@@ -27,10 +27,10 @@ func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiAr
 	for i := 0; i < numThreads; i++ {
 		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			for task := range tasks {
 				task()
 			}
-			wg.Done()
 		}()
 	}
 

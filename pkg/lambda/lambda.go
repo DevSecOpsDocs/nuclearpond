@@ -44,12 +44,13 @@ func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
 	// print responseInterface output value
 	lambdaResponse := responseInterface.(map[string]interface{})["output"]
 
-	// Change outputs depending on the output type
-	if output == "s3" {
+	// Change outputs depending on the output
+	switch output {
+	case "s3":
 		outputs.S3Output(lambdaResponse)
-	} else if output == "cmd" {
+	case "cmd":
 		outputs.CmdOutput(lambdaResponse)
-	} else if output == "json" {
+	case "json":
 		outputs.JsonOutput(lambdaResponse)
 	}
 }
