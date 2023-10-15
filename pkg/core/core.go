@@ -10,7 +10,7 @@ import (
 	"github.com/DevSecOpsDocs/nuclearpond/pkg/lambda"
 )
 
-func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiArgs string, threads int, silent bool) {
+func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiArgs string, threads int, silent bool, region string) {
 	// Get start time
 	start := time.Now()
 
@@ -47,7 +47,7 @@ func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiAr
 			Output:  output,
 		}
 		tasks <- func() {
-			lambda.InvokeLambdas(lambdaInvoke, lambdaName, output)
+			lambda.InvokeLambdas(lambdaInvoke, lambdaName, output, region)
 		}
 	}
 
@@ -59,3 +59,4 @@ func ExecuteScans(batches [][]string, output string, lambdaName string, nucleiAr
 		log.Println("Completed all parallel operations, best of luck! Completed in", time.Since(start))
 	}
 }
+
