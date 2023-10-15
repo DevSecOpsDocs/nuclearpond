@@ -47,13 +47,11 @@ var runCmd = &cobra.Command{
 			fmt.Println()
 		}
 
-		// Nuclei args flag
 		if nucleiArgs == "" {
 			log.Fatal("Nuclei arguments are required")
 			os.Exit(1)
 		}
 
-		// Targets flag
 		if targets == "" && target == "" {
 			log.Fatal("Either a target or a list of targets is required")
 			os.Exit(1)
@@ -66,12 +64,12 @@ var runCmd = &cobra.Command{
 			batches := helpers.SplitSlice(urls, batchSize)
 			log.Println("Splitting targets into", len(batches), "individual executions")
 			log.Println("Running with " + fmt.Sprint(threads) + " threads")
-			core.ExecuteScans(batches, output, functionName, nucleiArgs, threads, silent)
+			core.ExecuteScans(batches, output, functionName, nucleiArgs, threads, silent, region)
 		} else {
 			log.Println("Running nuclei against the target", target)
 			log.Println("Running with " + fmt.Sprint(threads) + " threads")
 			batches := [][]string{{target}}
-			core.ExecuteScans(batches, output, functionName, nucleiArgs, threads, silent)
+			core.ExecuteScans(batches, output, functionName, nucleiArgs, threads, silent, region)
 		}
 	},
 }
@@ -108,13 +106,15 @@ func init() {
 	// Region flag
 	runCmd.Flags().StringVarP(&region, "region", "r", "", "AWS region to run nuclei")
 	if region == "" {
-		region, ok := os.LookupEnv("AWS_REGION")
+		var ok bool // Declare ok here to avoid shadowing
+		region, ok = os.LookupEnv("AWS_REGION") // Removed := to modify the existing region variable
 		if !ok {
 			runCmd.MarkFlagRequired("region")
 		} else {
 			runCmd.Flags().Set("region", region)
 		}
 	}
+
 	// Function name flag
 	runCmd.Flags().StringVarP(&functionName, "function-name", "f", "", "AWS Lambda function name")
 	if functionName == "" {

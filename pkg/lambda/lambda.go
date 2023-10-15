@@ -20,7 +20,7 @@ type LambdaInvoke struct {
 }
 
 // Stage the lambda function for executing
-func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
+func InvokeLambdas(payload LambdaInvoke, lambda string, output string, region string) {
 	// Bug to fix another day
 	if payload.Targets[0] == "" {
 		return
@@ -33,7 +33,7 @@ func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
 	}
 
 	// invoke lambda function
-	response, err := invokeFunction(string(lambdaInvokeJson), lambda)
+	response, err := invokeFunction(string(lambdaInvokeJson), lambda, region)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -56,10 +56,10 @@ func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
 }
 
 // Execute a lambda function and return the response
-func invokeFunction(payload string, functionName string) (string, error) {
+func invokeFunction(payload string, functionName string, region string) (string, error) {
 	// Create a new session
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1")},
+		Region: aws.String(region)}, // Using the passed region here
 	)
 
 	// Create a Lambda service client.
@@ -81,3 +81,4 @@ func invokeFunction(payload string, functionName string) (string, error) {
 	// Return the response
 	return string(result.Payload), nil
 }
+

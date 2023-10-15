@@ -23,20 +23,19 @@ func backgroundScan(scanInput Request, scanId string) {
 	NucleiArgs := base64.StdEncoding.EncodeToString([]byte(scanInput.Args))
 	silent := true
 
-	// Fail if AWS_LAMBDA_FUNCTION_NAME and AWS_REGION are not set
 	functionName := os.Getenv("AWS_LAMBDA_FUNCTION_NAME")
 	regionName := os.Getenv("AWS_REGION")
 	dynamodbTable := os.Getenv("AWS_DYNAMODB_TABLE")
+
 	if functionName == "" || regionName == "" || dynamodbTable == "" {
-		log.Fatal("AWS_LAMBDA_FUNCTION_NAME is not set")
+		log.Fatal("Environment variables (AWS_LAMBDA_FUNCTION_NAME, AWS_REGION, AWS_DYNAMODB_TABLE) are not set.")
 	}
 
-	// Convert scanId to a valid DynamoDB key
 	requestId := strings.ReplaceAll(scanId, "-", "")
 
 	log.Println("Initiating scan with the id of ", scanId, "with", len(targets), "targets")
 	storeScanState(requestId, "running")
-	core.ExecuteScans(batches, output, functionName, NucleiArgs, threads, silent)
+	core.ExecuteScans(batches, output, functionName, NucleiArgs, threads, silent, regionName)
 	storeScanState(requestId, "completed")
 	log.Println("Scan", scanId, "completed")
 }
