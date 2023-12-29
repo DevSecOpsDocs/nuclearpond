@@ -1,9 +1,11 @@
-# Nuclear Pond
+# Nuclear Pond V.2
 
+`We forked this project so we can continue with this great idea, I hope that together we can improve the code and make it available to everyone - @OFJAAAH`
 
 <img src="assets/logo.png" width="400" height="300" align="right">
 
-Nuclear Pond is used to leverage [Nuclei](https://github.com/projectdiscovery/nuclei) in the cloud with unremarkable speed, flexibility, and [perform internet wide scans for far less than a cup of coffee](https://devsecopsdocs.com/blog/nuclear-pond/). 
+To install Nuclear Pond, you need to configure the backend [terraform module](https://github.com/DevSecOpsDocs/terraform-nuclear-pond). You can do this by running `terraform apply` or by leveraging [terragrunt](https://terragrunt.gruntwork.io/). 
+
 
 It leverages [AWS Lambda](https://aws.amazon.com/lambda/) as a backend to invoke Nuclei scans in parallel, choice of storing json findings in s3 to query with [AWS Athena](https://aws.amazon.com/athena/), and is easily one of the cheapest ways you can execute scans in the cloud. 
 
@@ -24,7 +26,8 @@ Think of Nuclear Pond as just a way for you to run Nuclei in the cloud. You can 
 
 ## Setup & Installation
 
-To install Nuclear Pond, you need to configure the backend [terraform module](https://github.com/DevSecOpsDocs/terraform-nuclear-pond). You can do this by running `terraform apply` or by leveraging [terragrunt](https://terragrunt.gruntwork.io/). 
+To install Nuclear Pond, you need to configure the backend [terraform module](https://github.com/KingOfBugbounty/terraform-nuclear-pond-OFJAAAH). You can do this by running `terraform apply` or by leveraging [terragrunt](https://terragrunt.gruntwork.io/). 
+
 
 ```bash
 $ go install github.com/DevSecOpsDocs/nuclearpond@latest

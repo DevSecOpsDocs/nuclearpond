@@ -1,83 +1,82 @@
 package lambda
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"os"
+    "encoding/json"
+    "fmt"
+    "log"
+    "os"
 
-	"github.com/DevSecOpsDocs/nuclearpond/pkg/outputs"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/lambda"
+    "github.com/DevSecOpsDocs/nuclearpond/pkg/outputs"
+    "github.com/aws/aws-sdk-go/aws"
+    "github.com/aws/aws-sdk-go/aws/session"
+    "github.com/aws/aws-sdk-go/service/lambda"
 )
 
-// struct for lambda invoke
+// LambdaInvoke estrutura para invocar a função lambda.
 type LambdaInvoke struct {
-	Targets []string `json:"Targets"`
-	Args    []string `json:"Args"`
-	Output  string   `json:"Output"`
+    Targets []string `json:"Targets"`
+    Args    []string `json:"Args"`
+    Output  string   `json:"Output"`
 }
 
-// Stage the lambda function for executing
-func InvokeLambdas(payload LambdaInvoke, lambda string, output string) {
-	// Bug to fix another day
-	if payload.Targets[0] == "" {
-		return
-	}
+// InvokeLambdas prepara e executa a função lambda.
+func InvokeLambdas(payload LambdaInvoke, lambdaFunction string, output string, region string) {
+    if len(payload.Targets) == 0 {
+        return
+    }
 
-	// convert lambdaInvoke to json string
-	lambdaInvokeJson, err := json.Marshal(payload)
-	if err != nil {
-		log.Fatal(err)
-	}
+    lambdaInvokeJson, err := json.Marshal(payload)
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	// invoke lambda function
-	response, err := invokeFunction(string(lambdaInvokeJson), lambda)
-	if err != nil {
-		fmt.Println(err)
-	}
+    response, err := invokeFunction(string(lambdaInvokeJson), lambdaFunction, region)
+    if err != nil {
+        log.Println("Erro ao invocar a função lambda:", err)
+        return
+    }
 
-	// Parse lambda response Output
-	var responseInterface interface{}
-	json.Unmarshal([]byte(response), &responseInterface)
-	// print responseInterface output value
-	lambdaResponse := responseInterface.(map[string]interface{})["output"]
+    var responseInterface map[string]interface{}
+    err = json.Unmarshal([]byte(response), &responseInterface)
+    if err != nil {
+        log.Println("Erro ao deserializar a resposta da função lambda:", err)
+        return
+    }
 
-	// Change outputs depending on the output
-	switch output {
-	case "s3":
-		outputs.S3Output(lambdaResponse)
-	case "cmd":
-		outputs.CmdOutput(lambdaResponse)
-	case "json":
-		outputs.JsonOutput(lambdaResponse)
-	}
+    lambdaResponse, exists := responseInterface["output"]
+    if !exists {
+        log.Println("Chave 'output' não encontrada na resposta da função lambda")
+        return
+    }
+
+    switch output {
+    case "s3":
+        outputs.S3Output(lambdaResponse)
+    case "cmd":
+        outputs.CmdOutput(lambdaResponse)
+    case "json":
+        outputs.JsonOutput(lambdaResponse)
+    }
 }
 
-// Execute a lambda function and return the response
-func invokeFunction(payload string, functionName string) (string, error) {
-	// Create a new session
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1")},
-	)
+// invokeFunction executa uma função lambda e retorna a resposta.
+func invokeFunction(payload string, functionName string, region string) (string, error) {
+    sess, err := session.NewSession(&aws.Config{Region: aws.String(region)})
+    if err != nil {
+        return "", fmt.Errorf("Erro ao criar sessão AWS: %v", err)
+    }
 
-	// Create a Lambda service client.
-	svc := lambda.New(sess)
+    svc := lambda.New(sess)
 
-	// Create the input
-	input := &lambda.InvokeInput{
-		FunctionName: aws.String(functionName),
-		Payload:      []byte(payload),
-	}
+    input := &lambda.InvokeInput{
+        FunctionName: aws.String(functionName),
+        Payload:      []byte(payload),
+    }
 
-	// Invoke the lambda function
-	result, err := svc.Invoke(input)
-	if err != nil {
-		log.Fatal("Failed to invoke lambda function: ", err)
-		os.Exit(1)
-	}
+    result, err := svc.Invoke(input)
+    if err != nil {
+        return "", fmt.Errorf("Erro ao invocar função lambda: %v", err)
+    }
 
-	// Return the response
-	return string(result.Payload), nil
+    return string(result.Payload), nil
 }
