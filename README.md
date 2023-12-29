@@ -1,5 +1,6 @@
-# Nuclear Pond
+# Nuclear Pond V.2
 
+We forked this project so we can continue with this great idea, I hope that together we can improve the code and make it available to everyone - @OFJAAAH
 
 <img src="assets/logo.png" width="400" height="300" align="right">
 
