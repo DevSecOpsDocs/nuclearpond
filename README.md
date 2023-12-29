@@ -25,7 +25,7 @@ Think of Nuclear Pond as just a way for you to run Nuclei in the cloud. You can 
 
 ## Setup & Installation
 
-To install Nuclear Pond, you need to configure the backend [terraform module](https://github.com/DevSecOpsDocs/terraform-nuclear-pond). You can do this by running `terraform apply` or by leveraging [terragrunt](https://terragrunt.gruntwork.io/). 
+To install Nuclear Pond, you need to configure the backend [terraform module]([https://github.com/DevSecOpsDocs/terraform-nuclear-pond](https://github.com/KingOfBugbounty/terraform-nuclear-pond-OFJAAAH)). You can do this by running `terraform apply` or by leveraging [terragrunt](https://terragrunt.gruntwork.io/). 
 
 ```bash
 $ go install github.com/DevSecOpsDocs/nuclearpond@latest
